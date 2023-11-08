@@ -90,6 +90,25 @@ class UsersController {
         }
 
     }
+
+    public function updateUser($data){
+        
+        $user = new User();
+
+        $user->firstname = $data->firstname;
+        $user->lastname = $data->lastname;
+        $user->username = $data->username;
+        $user->email = $data->email;
+        $user->status = 0;
+
+        if($user->updateUser($user)){
+            echo 'User updated successfully.';
+        }
+        else{
+            echo 'User not updated verify info';
+        }
+
+    }
 }
 
 ?>

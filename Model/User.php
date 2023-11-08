@@ -77,10 +77,29 @@ class User {
         return false;
     }
 
-    public function updateUser(){
-        $sqlQuery = "UPDATE"
+    public function updateUser($user){
+
+        $usedEmail = $this->getSingleUserEmail($user->email);
+        $usedUser = $this->getSingleUserUserName($user->username);
+
+        if($usedEmail && $usedUser){
+            echo "This e-mail and username are already in use";
+            die;
+        }
+
+        if($usedUser) {
+            echo "This username is already in use";
+            die;
+        }
+
+        if($usedEmail) {
+            echo "This e-mail is already in use";
+            die;
+        }
+
+        $sqlQuery = "UPDATE "
                     . $this->db_table .
-                    "SET 
+                    " SET 
                         username = :username,
                         firstname = :name,
                         lastname = :lastname,
@@ -88,28 +107,30 @@ class User {
                         status = :status
                     WHERE
                         ID = :id";
-        
         $stmt = $this->conn->prepare($sqlQuery);
 
-        $this->id=htmlspecialchars(strip_tags($this->id));
-        $this->status=htmlspecialchars(strip_tags($this->status));
-        $this->username=htmlspecialchars(strip_tags($this->username));
-        $this->email=htmlspecialchars(strip_tags($this->email));
-        $this->firstname=htmlspecialchars(strip_tags($this->firstname));
-        $this->lastname=htmlspecialchars(strip_tags($this->lastname));
+        $user->id=htmlspecialchars(strip_tags($user->id));        
+        $user->username=htmlspecialchars(strip_tags($user->username));
+        $user->email=htmlspecialchars(strip_tags($user->email));
+        $user->firstname=htmlspecialchars(strip_tags($user->firstname));
+        $user->lastname=htmlspecialchars(strip_tags($user->lastname));
+        $user->status=htmlspecialchars(strip_tags($user->status));
+        
 
-        $stmt->bindParam(":id", $this->id);
-        $stmt->bindParam(":status", $this->status);
-        $stmt->bindParam(":username", $this->username);
-        $stmt->bindParam(":email", $this->email);
-        $stmt->bindParam(":firstname", $this->firstname);
-        $stmt->bindParam(":lastname", $this->lastname);
+        $stmt->bindParam(":id", $user->id);
+        $stmt->bindParam(":username", $user->username);
+        $stmt->bindParam(":email", $user->email);
+        $stmt->bindParam(":name", $user->firstname);
+        $stmt->bindParam(":lastname", $user->lastname);
+        $stmt->bindParam(":status", $user->status);
 
         if($stmt->execute()){
             return true;
         }
 
         return false;
+
+
     }
 
     public function getSingleUser(){
