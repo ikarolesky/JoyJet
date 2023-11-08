@@ -79,6 +79,117 @@ class User {
 
     public function updateUser($user){
 
+        $currentInfo = $this->getUserData($user->id);
+
+        if($currentInfo['email'] == $user->email && $currentInfo['username'] == $user->username) {
+            $sqlQuery = "UPDATE "
+                    . $this->db_table .
+                    " SET 
+                        firstname = :name,
+                        lastname = :lastname,
+                        status = :status
+                    WHERE
+                        ID = :id";
+            $stmt = $this->conn->prepare($sqlQuery);
+
+            $user->id=htmlspecialchars(strip_tags($user->id));        
+            $user->firstname=htmlspecialchars(strip_tags($user->firstname));
+            $user->lastname=htmlspecialchars(strip_tags($user->lastname));
+            $user->status=htmlspecialchars(strip_tags($user->status));
+            
+
+            $stmt->bindParam(":id", $user->id);
+            $stmt->bindParam(":name", $user->firstname);
+            $stmt->bindParam(":lastname", $user->lastname);
+            $stmt->bindParam(":status", $user->status);
+
+            if($stmt->execute()){
+                return true;
+            }
+
+            return false;
+        }
+
+        if($currentInfo['email'] == $user->email) {
+
+            $usedUser = $this->getSingleUserUserName($user->username);
+
+            if($usedUser) {
+                echo "This username is already in use";
+                die;
+            }
+
+            $sqlQuery = "UPDATE "
+                    . $this->db_table .
+                    " SET 
+                        firstname = :name,
+                        lastname = :lastname,
+                        status = :status,
+                        username = :username
+                    WHERE
+                        ID = :id";
+            $stmt = $this->conn->prepare($sqlQuery);
+
+            $user->id=htmlspecialchars(strip_tags($user->id));        
+            $user->firstname=htmlspecialchars(strip_tags($user->firstname));
+            $user->username=htmlspecialchars(strip_tags($user->username));
+            $user->lastname=htmlspecialchars(strip_tags($user->lastname));
+            $user->status=htmlspecialchars(strip_tags($user->status));
+            
+
+            $stmt->bindParam(":id", $user->id);
+            $stmt->bindParam(":name", $user->firstname);
+            $stmt->bindParam(":username", $user->username);
+            $stmt->bindParam(":lastname", $user->lastname);
+            $stmt->bindParam(":status", $user->status);
+
+            if($stmt->execute()){
+                return true;
+            }
+
+            return false;
+        }
+
+        if($currentInfo['username'] == $user->username) {
+
+            $usedEmail = $this->getSingleUserEmail($user->email);
+
+            if($usedEmail) {
+                echo "This email is already in use";
+                die;
+            }
+
+            $sqlQuery = "UPDATE "
+                    . $this->db_table .
+                    " SET 
+                        firstname = :name,
+                        lastname = :lastname,
+                        status = :status,
+                        email = :email
+                    WHERE
+                        ID = :id";
+            $stmt = $this->conn->prepare($sqlQuery);
+
+            $user->id=htmlspecialchars(strip_tags($user->id));        
+            $user->email=htmlspecialchars(strip_tags($user->email));
+            $user->firstname=htmlspecialchars(strip_tags($user->firstname));
+            $user->lastname=htmlspecialchars(strip_tags($user->lastname));
+            $user->status=htmlspecialchars(strip_tags($user->status));
+            
+
+            $stmt->bindParam(":id", $user->id);
+            $stmt->bindParam(":name", $user->firstname);
+            $stmt->bindParam(":lastname", $user->lastname);
+            $stmt->bindParam(":status", $user->status);
+            $stmt->bindParam(":email", $user->email);
+
+            if($stmt->execute()){
+                return true;
+            }
+
+            return false;
+        }
+
         $usedEmail = $this->getSingleUserEmail($user->email);
         $usedUser = $this->getSingleUserUserName($user->username);
 
@@ -150,6 +261,20 @@ class User {
             $this->lastname = $dataRow['lastname'];
             $this->status = $dataRow['status'];
         }
+    }
+
+    public function getUserData($id){
+        $sqlQuery = "SELECT * FROM "
+                    . $this->db_table .
+                    " WHERE ID = :id LIMIT 0,1 ";
+
+        $stmt = $this->conn->prepare($sqlQuery);
+        $stmt->bindParam(":id", $id);
+
+        $stmt->execute();
+        $dataRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $dataRow;
     }
 
     public function getSingleUserEmail($email){
