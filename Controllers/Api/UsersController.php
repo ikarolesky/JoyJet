@@ -100,6 +100,7 @@ class UsersController {
         $user->username = $data->username;
         $user->email = $data->email;
         $user->status = 0;
+        $user->id = $data->id;
 
         if($user->updateUser($user)){
             echo 'User updated successfully.';
